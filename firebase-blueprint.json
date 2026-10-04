@@ -1,0 +1,70 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "User Profile",
+      "description": "User account profile storing municipal jurisdiction in Bangladesh (division, zilla, upazila) and coordinates",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "displayName": { "type": "string" },
+        "photoURL": { "type": "string" },
+        "division": { "type": "string" },
+        "zilla": { "type": "string" },
+        "upazila": { "type": "string" },
+        "locationName": { "type": "string" },
+        "lat": { "type": "number" },
+        "lon": { "type": "number" },
+        "role": { "type": "string", "enum": ["citizen", "urban_planner", "emergency_responder", "researcher", "planner", "emergency_officer"] },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["uid", "email", "division", "zilla", "upazila", "lat", "lon"]
+    },
+    "IncidentReport": {
+      "title": "Crowdsourced Incident Report",
+      "description": "Citizen and officer real-time hazard reports covering waterlogging, fallen trees, electrical risks, and blockages",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "type": { "type": "string", "enum": ["waterlogging", "fallen_tree", "electrical_wire", "open_manhole", "road_damage", "gas_leak", "fire_smoke", "traffic_gridlock", "other"] },
+        "severity": { "type": "string", "enum": ["low", "medium", "high", "critical"] },
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "division": { "type": "string" },
+        "zilla": { "type": "string" },
+        "upazila": { "type": "string" },
+        "landmark": { "type": "string" },
+        "lat": { "type": "number" },
+        "lon": { "type": "number" },
+        "waterDepthCm": { "type": "number" },
+        "photoPreset": { "type": "string" },
+        "status": { "type": "string", "enum": ["reported", "investigating", "dispatched", "resolved"] },
+        "upvotes": { "type": "number" },
+        "upvotedUserIds": { "type": "array", "items": { "type": "string" } },
+        "reportedBy": {
+          "type": "object",
+          "properties": {
+            "uid": { "type": "string" },
+            "name": { "type": "string" },
+            "role": { "type": "string" }
+          },
+          "required": ["name"]
+        },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["type", "severity", "title", "division", "zilla", "upazila", "lat", "lon", "status", "upvotes"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "UserProfile",
+      "description": "User account profile storing residence jurisdiction in Bangladesh and coordinates"
+    },
+    "/incidents/{incidentId}": {
+      "schema": "IncidentReport",
+      "description": "Crowdsourced hazard reports submitted by citizens and urban responders across Bangladesh"
+    }
+  }
+}

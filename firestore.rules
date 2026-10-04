@@ -1,0 +1,68 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Default deny catch-all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function isValidUserProfile(data) {
+      return data.uid is string &&
+             data.uid == request.auth.uid &&
+             data.email is string &&
+             data.email.size() <= 150 &&
+             data.division is string &&
+             data.division.size() <= 80 &&
+             data.zilla is string &&
+             data.zilla.size() <= 80 &&
+             data.upazila is string &&
+             data.upazila.size() <= 80 &&
+             data.lat is number &&
+             data.lon is number;
+    }
+
+    function isValidIncident(data) {
+      return data.type is string &&
+             data.severity is string &&
+             data.title is string &&
+             data.title.size() <= 200 &&
+             data.division is string &&
+             data.zilla is string &&
+             data.upazila is string &&
+             data.lat is number &&
+             data.lon is number &&
+             data.status in ['reported', 'investigating', 'dispatched', 'resolved'] &&
+             data.upvotes is number;
+    }
+
+    match /test/{docId} {
+      allow read: if true;
+    }
+
+    // User profiles
+    match /users/{userId} {
+      allow get: if isSignedIn() && isValidId(userId) && request.auth.uid == userId;
+      allow list: if isSignedIn() && resource.data.uid == request.auth.uid;
+      allow create: if isSignedIn() && isValidId(userId) && request.auth.uid == userId && isValidUserProfile(request.resource.data);
+      allow update: if isSignedIn() && isValidId(userId) && request.auth.uid == userId && isValidUserProfile(request.resource.data);
+      allow delete: if isSignedIn() && isValidId(userId) && request.auth.uid == userId;
+    }
+
+    // Crowdsourced Incidents: readable by all citizens and responders
+    match /incidents/{incidentId} {
+      allow read: if true;
+      allow create: if isValidIncident(request.resource.data);
+      allow update: if isValidIncident(request.resource.data);
+      allow delete: if isSignedIn();
+    }
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "name": "NagarShield AI - Urban Mobility & Climate Resilience",
+  "description": "AI-powered urban decision-support platform combining flood risk, heat exposure, and traffic mobility intelligence for resilient cities.",
+  "requestFramePermissions": ["microphone", "geolocation"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
